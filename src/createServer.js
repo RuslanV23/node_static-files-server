@@ -25,15 +25,29 @@ function createServer() {
 
       if (path.extname(pathname)) {
         res.statusCode = 400;
-        res.end('URL is not correct');
+        res.setHeader('Content-Type', 'text/plain');
+
+        res.end(
+          // eslint-disable-next-line max-len
+          'The URL should be something like "/file/nonexistent.txt" or "/file/"',
+        );
       } else {
         res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain');
 
         res.end(
           // eslint-disable-next-line max-len
           'The URL should be something like "/file/nonexistent.txt" or "/file/"',
         );
       }
+
+      return;
+    }
+
+    if (pathname.includes('//')) {
+      res.setHeader('Content-Type', 'text/plain');
+      res.statusCode = 404;
+      res.end('URL is not correct');
 
       return;
     }
@@ -50,19 +64,11 @@ function createServer() {
 
     const ext = path.extname(filePath);
 
-    if (!contentTypes[ext] && filePath.at(-1) !== '/') {
+    if (!ext && filePath.at(-1) !== '/') {
       res.setHeader('Content-Type', 'text/plain');
       res.statusCode = 200;
 
       res.end('The URL should be something like "/dir/file.txt" or "/file/"');
-
-      return;
-    }
-
-    if (filePath.includes('//')) {
-      res.setHeader('Content-Type', 'text/plain');
-      res.statusCode = 404;
-      res.end('URL is not correct');
 
       return;
     }
